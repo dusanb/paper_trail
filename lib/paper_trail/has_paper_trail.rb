@@ -22,7 +22,7 @@ module PaperTrail
         send :include, InstanceMethods
 
         # The version this instance was reified from.
-        attr_accessor :version
+        attr_accessor :pt_version
 
         cattr_accessor :ignore
         self.ignore = (options[:ignore] || []).map &:to_s
@@ -59,7 +59,7 @@ module PaperTrail
       # Returns true if this instance is the current, live one;
       # returns false if this instance came from a previous version.
       def live?
-        version.nil?
+        pt_version.nil?
       end
 
       # Returns who put the object into its current state.
@@ -71,13 +71,13 @@ module PaperTrail
       def version_at(timestamp, reify_options={})
         # Because a version stores how its object looked *before* the change,
         # we need to look for the first version created *after* the timestamp.
-        version = versions.after(timestamp).first
-        version ? version.reify(reify_options) : self
+        pt_version = versions.after(timestamp).first
+        pt_version ? pt_version.reify(reify_options) : self
       end
 
       # Returns the object (not a Version) as it was most recently.
       def previous_version
-        preceding_version = version ? version.previous : versions.last
+        preceding_version = pt_version ? pt_version.previous : versions.last
         preceding_version.try :reify
       end
 
@@ -85,7 +85,7 @@ module PaperTrail
       def next_version
         # NOTE: if self (the item) was not reified from a version, i.e. it is the
         # "live" item, we return nil.  Perhaps we should return self instead?
-        subsequent_version = version ? version.next : nil
+        subsequent_version = pt_version ? pt_version.next : nil
         subsequent_version.reify if subsequent_version
       end
 

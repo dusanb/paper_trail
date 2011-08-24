@@ -68,7 +68,7 @@ class Version < ActiveRecord::Base
         end
       end
 
-      model.version = self
+      model.pt_version = self
 
       unless options[:has_one] == false
         reify_has_ones model, options[:has_one]
